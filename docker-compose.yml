@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+  refactor-this.db:
+    image: mcr.microsoft.com/mssql/server:2019-latest   
+    ports:
+     - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y 
+      - SA_PASSWORD=L0calpaS5      
+    networks:
+      - refactor-network
+      
+  refactor-this.log:
+    image: datalust/seq:latest
+    ports:
+      - "81:81"
+      - "5341:5341"
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      - refactor-network
+
+#  refactor-this.api:
+#    image: refactor-this.api:${TAG:-latest}
+#    ports:
+#      - "5001:5001"
+#    build:
+#      context: .
+#      dockerfile: src/Dockerfile
+#    networks:
+#      - refactor-network    
+#    depends_on:
+#      - refactor-this.db
+
+networks:
+  refactor-network:
