@@ -19,7 +19,7 @@ namespace RefactorThis
                 .Enrich.WithProperty("ApplicationVersion", ApplicationVersion.Value)
                 .Enrich.WithProperty("Hostname", Dns.GetHostName())
                 .WriteTo.Console(new RenderedCompactJsonFormatter())
-                .WriteTo.Seq("http://localhost:5341")
+                .WriteTo.Seq("http://refactorlog:5341")
                 .CreateLogger();
 
             try
