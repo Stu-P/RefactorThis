@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using FluentAssertions.Common;
 using Moq;
 using RefactorThis.Core.Exceptions;
@@ -79,6 +80,34 @@ namespace RefactorThis.UnitTests
 
             // Act + Assert
             await Assert.ThrowsAsync<EntityNotFoundException>(async () => await fixture.SUT().UpdateProduct(request));
+        }
+
+        [Fact]
+        public async Task ReturnEmptyCollectionOnGetProductOptions_IfProductOptionsNull()
+        {
+            // Arrange
+            var fixture = new ProductServiceTestFixture();
+            var testGuid = Guid.Parse("085cba18-79ed-46e3-9c50-8607e20e351e");
+
+            var product = new Product
+            {
+                Id = testGuid,
+                Name = "iPhone",
+                Description = "think different",
+                Price = 1,
+                DeliveryPrice = 1,
+                Options = null
+            };
+
+            fixture.MockRepository.Setup(x => x.GetProductById(It.IsAny<Guid>(), It.IsAny<bool>())).ReturnsAsync(product);
+
+
+            // Act
+            var actual = await fixture.SUT().GetProductOptions(testGuid);
+
+            // Assert
+            actual.Should().NotBeNull();
+            actual.Should().BeEmpty();
         }
     }
 }

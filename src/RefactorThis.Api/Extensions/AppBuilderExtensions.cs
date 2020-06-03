@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Polly;
 using RefactorThis.Data.Contexts;
 
 namespace RefactorThis.Api.Extensions
@@ -18,7 +19,19 @@ namespace RefactorThis.Api.Extensions
                 try
                 {
                     logger.LogInformation("Run pending DB migration scripts");
-                    context.Database.Migrate();
+
+                    Policy
+                      .Handle<Exception>()
+                      .WaitAndRetry(new[]
+                      {
+                        TimeSpan.FromSeconds(15),
+                        TimeSpan.FromSeconds(15),
+                        TimeSpan.FromSeconds(30)
+                      }, (exception, timeSpan) =>
+                      {
+                          logger.LogError("Db migration script failed, retrying");
+                      }).Execute(() => context.Database.Migrate());
+
                 }
                 catch (Exception ex)
                 {
