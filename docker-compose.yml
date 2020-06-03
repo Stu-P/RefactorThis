@@ -14,7 +14,7 @@ services:
   refactorlog:
     image: datalust/seq:latest
     ports:
-      - "85:85"
+      - "5001:80"
       - "5341:5341"
     environment:
       - ACCEPT_EULA=Y
