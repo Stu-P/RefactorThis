@@ -3,8 +3,8 @@ using RefactorThis.Core.Interfaces;
 
 namespace RefactorThis.Core.Services
 {
-    public class GuidGenerator : IGuidGenerator
+    public class KeyGenerator : IKeyGenerator
     {
-        public Guid NewGuid() => Guid.NewGuid();
+        public Guid NewKey() => Guid.NewGuid();
     }
 }

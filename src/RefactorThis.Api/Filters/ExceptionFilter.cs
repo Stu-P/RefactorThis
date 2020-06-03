@@ -21,6 +21,7 @@ namespace RefactorThis.Api.Filters
             switch (context.Exception)
             {
                 case EntityNotFoundException _:
+                    _logger.LogInformation(context.Exception.Message);
                     context.Result = new NotFoundObjectResult(new ErrorResponse { Title = context.Exception.Message });
                     break;
 

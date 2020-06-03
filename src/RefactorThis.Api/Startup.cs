@@ -54,7 +54,7 @@ namespace RefactorThis
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blockchain Api");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "RefactorThis Api");
             });
         }
     }

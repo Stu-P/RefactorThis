@@ -54,7 +54,7 @@ namespace RefactorThis.Api.IntegrationTests
             [Fact]
             public async Task ReturnProduct_WhenEntityWithRequestedIdExists()
             {
-                var response = await _sut.Client.GetAsync("api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
+                var response = await _sut.Client.GetAsync("api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
                 response.EnsureSuccessStatusCode();
                 var actual = JsonConvert.DeserializeObject<Product>(await response.Content.ReadAsStringAsync());
                 actual.Should().NotBeNull();
@@ -65,7 +65,7 @@ namespace RefactorThis.Api.IntegrationTests
             public async Task ReturnNotFound_WhenEntityWithRequestedIdDoesNotExist()
             {
                 var invalidGuid = "93bf59d9-ab25-45a0-ae80-0650a27b4acf";
-                var response = await _sut.Client.GetAsync($"api/Products/{invalidGuid}");
+                var response = await _sut.Client.GetAsync($"api/products/{invalidGuid}");
                 response.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
         }
@@ -131,10 +131,10 @@ namespace RefactorThis.Api.IntegrationTests
                 };
 
                 var payload = new StringContent(JsonConvert.SerializeObject(update), Encoding.UTF8, "application/json");
-                var response = await _sut.Client.PutAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2", payload);
+                var response = await _sut.Client.PutAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2", payload);
                 response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-                var getResponse = await _sut.Client.GetAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
+                var getResponse = await _sut.Client.GetAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
                 getResponse.EnsureSuccessStatusCode();
                 var actual = JsonConvert.DeserializeObject<Product>(await getResponse.Content.ReadAsStringAsync());
                 actual.Should().NotBeNull();
@@ -151,10 +151,10 @@ namespace RefactorThis.Api.IntegrationTests
             [Fact]
             public async Task ReturnNoContent_WhenDeleteSuccessful()
             {
-                var response = await _sut.Client.DeleteAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
+                var response = await _sut.Client.DeleteAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
                 response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-                var getResponse = await _sut.Client.GetAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
+                var getResponse = await _sut.Client.GetAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2");
                 getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
         }
@@ -168,7 +168,7 @@ namespace RefactorThis.Api.IntegrationTests
             [Fact]
             public async Task ReturnAllProductOptionsForSpecifiedProduct()
             {
-                var response = await _sut.Client.GetAsync("api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/Options");
+                var response = await _sut.Client.GetAsync("api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/Options");
                 response.EnsureSuccessStatusCode();
                 var actual = JsonConvert.DeserializeObject<GetAllResponse<ProductOption>>(await response.Content.ReadAsStringAsync());
 
@@ -180,7 +180,7 @@ namespace RefactorThis.Api.IntegrationTests
             [Fact]
             public async Task ReturnEmptyArray_WhenProductHasNoOptions()
             {
-                var response = await _sut.Client.GetAsync("api/Products/6b354c4a-7bf0-40f9-a872-6990d06c31c5/Options");
+                var response = await _sut.Client.GetAsync("api/products/6b354c4a-7bf0-40f9-a872-6990d06c31c5/Options");
                 response.EnsureSuccessStatusCode();
                 var actual = JsonConvert.DeserializeObject<GetAllResponse<ProductOption>>(await response.Content.ReadAsStringAsync());
 
@@ -198,7 +198,7 @@ namespace RefactorThis.Api.IntegrationTests
             [Fact]
             public async Task ReturnOptionForProduct_WhenSpecifiedProductOptionExists()
             {
-                var response = await _sut.Client.GetAsync("api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/Options/0125bcb6-ca40-4cc0-ba0a-ce1bbd52ee42");
+                var response = await _sut.Client.GetAsync("api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/options/0125bcb6-ca40-4cc0-ba0a-ce1bbd52ee42");
                 response.EnsureSuccessStatusCode();
                 var actual = JsonConvert.DeserializeObject<ProductOption>(await response.Content.ReadAsStringAsync());
 
@@ -211,7 +211,7 @@ namespace RefactorThis.Api.IntegrationTests
             {
                 var invalidGuid = "93bf59d9-ab25-45a0-ae80-0650a27b4acf";
 
-                var response = await _sut.Client.GetAsync($"api/Products/0125bcb6-ca40-4cc0-ba0a-ce1bbd52ee42/Options/{invalidGuid}");
+                var response = await _sut.Client.GetAsync($"api/products/0125bcb6-ca40-4cc0-ba0a-ce1bbd52ee42/options/{invalidGuid}");
                 response.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
         }
@@ -232,7 +232,7 @@ namespace RefactorThis.Api.IntegrationTests
                 };
                 var payload = new StringContent(JsonConvert.SerializeObject(product), Encoding.UTF8, "application/json");
 
-                var response = await _sut.Client.PostAsync("api/Products/6b354c4a-7bf0-40f9-a872-6990d06c31c5/Options", payload);
+                var response = await _sut.Client.PostAsync("api/products/6b354c4a-7bf0-40f9-a872-6990d06c31c5/Options", payload);
                 response.EnsureSuccessStatusCode();
 
                 response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -251,7 +251,7 @@ namespace RefactorThis.Api.IntegrationTests
                 };
                 var payload = new StringContent(JsonConvert.SerializeObject(badProduct), Encoding.UTF8, "application/json");
 
-                var response = await _sut.Client.PostAsync($"api/Products/0125bcb6-ca40-4cc0-ba0a-ce1bbd52ee42/Options", payload);
+                var response = await _sut.Client.PostAsync($"api/products/0125bcb6-ca40-4cc0-ba0a-ce1bbd52ee42/Options", payload);
                 response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             }
         }
@@ -273,10 +273,10 @@ namespace RefactorThis.Api.IntegrationTests
                 };
 
                 var payload = new StringContent(JsonConvert.SerializeObject(update), Encoding.UTF8, "application/json");
-                var response = await _sut.Client.PutAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/Options/060071ff-7c9c-4954-a468-b7450b13cc86", payload);
+                var response = await _sut.Client.PutAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/options/060071ff-7c9c-4954-a468-b7450b13cc86", payload);
                 response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-                var getResponse = await _sut.Client.GetAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/Options/060071ff-7c9c-4954-a468-b7450b13cc86");
+                var getResponse = await _sut.Client.GetAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/options/060071ff-7c9c-4954-a468-b7450b13cc86");
                 getResponse.EnsureSuccessStatusCode();
                 var actual = JsonConvert.DeserializeObject<Product>(await getResponse.Content.ReadAsStringAsync());
                 actual.Should().NotBeNull();
@@ -293,10 +293,10 @@ namespace RefactorThis.Api.IntegrationTests
             [Fact]
             public async Task ReturnNoContent_WhenDeleteSuccessful()
             {
-                var response = await _sut.Client.DeleteAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/Options/060071ff-7c9c-4954-a468-b7450b13cc86");
+                var response = await _sut.Client.DeleteAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/options/060071ff-7c9c-4954-a468-b7450b13cc86");
                 response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-                var getResponse = await _sut.Client.GetAsync($"api/Products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/Options/060071ff-7c9c-4954-a468-b7450b13cc86");
+                var getResponse = await _sut.Client.GetAsync($"api/products/7928ca40-03b6-4859-b64d-f0ba26bc3de2/options/060071ff-7c9c-4954-a468-b7450b13cc86");
                 getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
             }
         }

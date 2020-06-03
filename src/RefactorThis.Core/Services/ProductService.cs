@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 using RefactorThis.Core.Exceptions;
-using RefactorThis.Core.Extensions;
 using RefactorThis.Core.Interfaces;
 using RefactorThis.Core.Models;
 
@@ -14,13 +14,15 @@ namespace RefactorThis.Core.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepo;
-        private readonly IGuidGenerator _guidGenerator;
+        private readonly IKeyGenerator _keyGenerator;
+        private readonly IMapper _mapper;
         private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IProductRepository productRepo, IGuidGenerator guidGenerator, ILogger<ProductService> logger)
+        public ProductService(IProductRepository productRepo, IKeyGenerator keyGenerator, IMapper mapper, ILogger<ProductService> logger)
         {
             _productRepo = productRepo ?? throw new ArgumentNullException(nameof(productRepo));
-            _guidGenerator = guidGenerator ?? throw new ArgumentNullException(nameof(guidGenerator));
+            _keyGenerator = keyGenerator ?? throw new ArgumentNullException(nameof(keyGenerator));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -29,22 +31,26 @@ namespace RefactorThis.Core.Services
             var timer = Stopwatch.StartNew();
             var allMatchingProducts = await _productRepo.GetProducts(nameFilter);
             _logger.LogInformation("GetProducts returned {count} products after {responseTime} ms", allMatchingProducts.Count(), timer.ElapsedMilliseconds);
-
-            return allMatchingProducts;
+            return allMatchingProducts ?? new List<Product>(); ;
         }
 
         public async Task<Product> GetProduct(Guid productId) => await GetProductIfExists(productId);
 
-        public async Task<Product> CreateProduct(Product newProduct)
+        public async Task<Product> CreateProduct(CreateProductRequest newProductRequest)
         {
-            newProduct.Id = _guidGenerator.NewGuid();
+            Product newProduct = _mapper.Map<Product>(newProductRequest);
+            newProduct.Id = _keyGenerator.NewKey();
             await _productRepo.AddProduct(newProduct);
             return newProduct;
         }
 
-        public async Task UpdateProduct(Product product)
+        public async Task UpdateProduct(UpdateProductRequest updateProductRequest)
         {
-            await _productRepo.UpdateProduct(product);
+            Product existing = await GetProductIfExists(updateProductRequest.Id)
+                ?? throw new EntityNotFoundException("No product found with prodict id {productId}"); ;
+
+            _mapper.Map(updateProductRequest, existing);
+            await _productRepo.UpdateProduct(existing);
         }
 
         public async Task DeleteProduct(Guid productId)
@@ -56,89 +62,56 @@ namespace RefactorThis.Core.Services
         public async Task<IEnumerable<ProductOption>> GetProductOptions(Guid productId)
         {
             var timer = Stopwatch.StartNew();
-
-            Product product = await _productRepo.GetProductById(productId, true);
-            if (product is null)
-            {
+            Product product = await _productRepo.GetProductById(productId, true) ??
                 throw new EntityNotFoundException("No product found with prodict id {productId}");
-            }
+
             _logger.LogInformation("Returned {count} options for product {productId} after {responseTime} ms", product.Options?.Count(), productId, timer.ElapsedMilliseconds);
-
-            return product.Options;
+            return product?.Options ?? new List<ProductOption>();
         }
 
-        public async Task<ProductOption> GetProductOption(Guid productId, Guid optionId)
-        {
-            var timer = new Stopwatch();
-            timer.Start();
-
-            var matchingOption = await _productRepo.GetProductOptionById(productId, optionId);
-
-            if (matchingOption is null)
-            {
-                _logger.LogWarning("No product option found for {id} after {responseTime} ms", productId, timer.ElapsedMilliseconds);
+        public async Task<ProductOption> GetProductOption(Guid productId, Guid optionId) =>
+            await _productRepo.GetProductOptionById(productId, optionId) ??
                 throw new EntityNotFoundException($"No product option found matching product id {productId} and option id {optionId}");
-            }
-            return matchingOption;
-        }
 
-        public async Task<ProductOption> AddOptionToProduct(Guid productId, ProductOption newOption)
+        public async Task<ProductOption> AddOptionToProduct(Guid productId, CreateProductOptionRequest newOptionRequest)
         {
-            var timer = Stopwatch.StartNew();
-
-            var productToUpdate = await _productRepo.GetProductById(productId, true);
-
-            if (productToUpdate is null)
-            {
+            Product productToUpdate = await _productRepo.GetProductById(productId, true) ??
                 throw new EntityNotFoundException("No product found with prodict id {productId}");
-            }
-            newOption.Id = _guidGenerator.NewGuid();
-            productToUpdate.Options.Add(newOption);
 
+            ProductOption newOption = _mapper.Map<ProductOption>(newOptionRequest);
+            newOption.Id = _keyGenerator.NewKey();
+            productToUpdate.Options.Add(newOption);
             await _productRepo.UpdateProduct(productToUpdate);
             return newOption;
         }
 
-        public async Task UpdateProductOption(Guid productId, ProductOption updatedOption)
+        public async Task UpdateProductOption(Guid productId, UpdateProductOptionRequest updatedOptionRequest)
         {
-            var timer = Stopwatch.StartNew();
+            Product productToUpdate = await _productRepo.GetProductById(productId, true);
+            ProductOption currentOption = productToUpdate?.Options?.FirstOrDefault(x => x.Id == updatedOptionRequest.Id) ??
+                throw new EntityNotFoundException($"No product option found matching product id {productId} and option id {updatedOptionRequest.Id}");
 
-            var productToUpdate = await _productRepo.GetProductById(productId, true);
-            var currentOption = productToUpdate?.Options?.FirstOrDefault(x => x.Id == updatedOption.Id);
-            if (currentOption is null)
-            {
-                throw new EntityNotFoundException($"No product option found matching product id {productId} and option id {updatedOption.Id}");
-            }
-            currentOption.MapChanges(updatedOption);
-
+            _mapper.Map(updatedOptionRequest, currentOption);
             await _productRepo.UpdateProduct(productToUpdate);
-            _logger.LogInformation("Product option {id} for product {productId} updated after {responseTime} ms", updatedOption.Id, productId, timer.ElapsedMilliseconds);
         }
 
         public async Task DeleteProductOption(Guid productId, Guid optionId)
         {
-            var productToUpdate = await _productRepo.GetProductById(productId, true);
-            ProductOption optionToRemove = productToUpdate?.Options?.FirstOrDefault(x => x.Id == optionId);
-            if (optionToRemove is null)
-            {
+            Product productToUpdate = await _productRepo.GetProductById(productId, true);
+            ProductOption optionToRemove = productToUpdate?.Options?.FirstOrDefault(x => x.Id == optionId) ??
                 throw new EntityNotFoundException($"No product option found matching product id {productId} and option id {optionId}");
-            }
+
             productToUpdate.Options.Remove(optionToRemove);
             await _productRepo.UpdateProduct(productToUpdate);
         }
 
-        private async Task<Product> GetProductIfExists(Guid productId)
+        private async Task<Product> GetProductIfExists(Guid productId, bool includeOptions = false)
         {
             var timer = Stopwatch.StartNew();
-
-            var product = await _productRepo.GetProductById(productId);
-            if (product is null)
-            {
-                _logger.LogWarning("No product found for {id} after {responseTime} ms", productId, timer.ElapsedMilliseconds);
+            Product product = await _productRepo.GetProductById(productId, includeOptions) ??
                 throw new EntityNotFoundException($"No product found with id {productId}");
-            }
-            _logger.LogInformation("Product {id} found after {responseTime} ms", productId, timer.ElapsedMilliseconds);
 
+            _logger.LogInformation("Product {id} found after {responseTime} ms", productId, timer.ElapsedMilliseconds);
             return product;
         }
     }

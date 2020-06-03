@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RefactorThis.Api", "src\RefactorThis.Api\RefactorThis.Api.csproj", "{E28D51C6-7C7A-447C-8924-E7CC0C82E298}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A1737FD7-A501-4446-A140-C81898D48738}"
+	ProjectSection(SolutionItems) = preProject
+		src\Dockerfile = src\Dockerfile
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9094F939-BF78-4068-AB09-022BD11E1516}"
 EndProject
@@ -24,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefactorThis.Tests.Common", "test\RefactorThis.Tests.Common\RefactorThis.Tests.Common.csproj", "{67A8AB31-83EB-409D-A314-F4D6BE94408D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RefactorThis.Tests.Common", "test\RefactorThis.Tests.Common\RefactorThis.Tests.Common.csproj", "{67A8AB31-83EB-409D-A314-F4D6BE94408D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
