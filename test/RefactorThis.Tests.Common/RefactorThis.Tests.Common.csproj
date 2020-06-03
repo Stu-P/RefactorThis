@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Builders\UpdateProductRequestBuilder.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\RefactorThis.Api\RefactorThis.Api.csproj" />
   </ItemGroup>
 

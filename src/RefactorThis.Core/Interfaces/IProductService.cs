@@ -11,9 +11,9 @@ namespace RefactorThis.Core.Interfaces
 
         Task<Product> GetProduct(Guid productId);
 
-        Task<Product> CreateProduct(Product newProduct);
+        Task<Product> CreateProduct(CreateProductRequest newProduct);
 
-        Task UpdateProduct(Product product);
+        Task UpdateProduct(UpdateProductRequest product);
 
         Task DeleteProduct(Guid productId);
 
@@ -21,9 +21,9 @@ namespace RefactorThis.Core.Interfaces
 
         Task<ProductOption> GetProductOption(Guid productId, Guid optionId);
 
-        Task<ProductOption> AddOptionToProduct(Guid productId, ProductOption newOption);
+        Task<ProductOption> AddOptionToProduct(Guid productId, CreateProductOptionRequest newOption);
 
-        Task UpdateProductOption(Guid productId, ProductOption option);
+        Task UpdateProductOption(Guid productId, UpdateProductOptionRequest option);
 
         Task DeleteProductOption(Guid productId, Guid optionId);
     }

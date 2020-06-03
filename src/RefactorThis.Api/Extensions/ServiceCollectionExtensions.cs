@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,8 +20,11 @@ namespace RefactorThis.Api.Extensions
         {
             services
                 .AddControllers(opts => opts.Filters.Add<ExceptionFilter>())
-                .AddNewtonsoftJson(opts => opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore)
-                .AddJsonOptions(opts => opts.JsonSerializerOptions.IgnoreNullValues = true)
+                .AddNewtonsoftJson(opts =>
+                {
+                    opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                    opts.UseMemberCasing();
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             return services;
@@ -52,7 +50,7 @@ namespace RefactorThis.Api.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services) =>
              services
                 .AddScoped<IProductService, ProductService>()
-                .AddScoped<IGuidGenerator, GuidGenerator>()
-                .AddAutoMapper(typeof(Startup));
+                .AddScoped<IKeyGenerator, KeyGenerator>()
+                .AddAutoMapper(typeof(Startup), typeof(Core.Mappers.ProductRequestMapping));
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace RefactorThis.Api.Models
+namespace RefactorThis.Core.Models
 {
     public class UpdateProductRequest : CreateProductRequest
     {

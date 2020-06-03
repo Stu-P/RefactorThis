@@ -2,8 +2,8 @@
 
 namespace RefactorThis.Core.Interfaces
 {
-    public interface IGuidGenerator
+    public interface IKeyGenerator
     {
-        Guid NewGuid();
+        Guid NewKey();
     }
 }

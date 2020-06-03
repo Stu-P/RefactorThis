@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,13 +14,11 @@ namespace RefactorThis.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IMapper _mapper;
         private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(IProductService productService, IMapper mapper, ILogger<ProductsController> logger)
+        public ProductsController(IProductService productService, ILogger<ProductsController> logger)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -40,7 +37,7 @@ namespace RefactorThis.Controllers
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateProduct(CreateProductRequest newProductRequest)
         {
-            var newProduct = await _productService.CreateProduct(_mapper.Map<Product>(newProductRequest));
+            var newProduct = await _productService.CreateProduct(newProductRequest);
             return CreatedAtAction(nameof(GetProductById), new { id = newProduct.Id }, newProduct);
         }
 
@@ -54,7 +51,7 @@ namespace RefactorThis.Controllers
                 _logger.LogError("Cannot Update Product, product {id} in path does not math {@payload}", id, updatedProduct);
                 return BadRequest(new ErrorResponse("product id in payload must match id in path"));
             }
-            await _productService.UpdateProduct(_mapper.Map<Product>(updatedProduct));
+            await _productService.UpdateProduct(updatedProduct);
             return NoContent();
         }
 
@@ -83,14 +80,14 @@ namespace RefactorThis.Controllers
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateProductOption(Guid productId, CreateProductOptionRequest newProductOptionRequest)
         {
-            var newProductOption = await _productService.AddOptionToProduct(productId, _mapper.Map<ProductOption>(newProductOptionRequest));
+            var newProductOption = await _productService.AddOptionToProduct(productId, newProductOptionRequest);
             return CreatedAtAction(nameof(GetProductOption), new { productId, id = newProductOption.Id }, newProductOption);
         }
 
         [HttpPut("{productId}/options/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateProductOption(Guid productId, Guid id, ProductOption updatedOption)
+        public async Task<IActionResult> UpdateProductOption(Guid productId, Guid id, UpdateProductOptionRequest updatedOption)
         {
             if (id != updatedOption.Id)
             {

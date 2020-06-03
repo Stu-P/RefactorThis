@@ -38,7 +38,6 @@ namespace RefactorThis.Data.Repositories
 
         public async Task UpdateProduct(Product updatedProduct)
         {
-            // _productDb.Products.Update(updatedProduct);
             _productDb.Entry(updatedProduct).State = EntityState.Modified;
             await _productDb.SaveChangesAsync();
         }

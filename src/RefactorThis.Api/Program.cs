@@ -43,6 +43,7 @@ namespace RefactorThis
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
+                    .UseUrls("http://*:5000")
                     .UseStartup<Startup>();
                 });
     }
