@@ -1,7 +1,6 @@
 # refactor-this
 
 > **_Dev notes_** | To run API (via docker), from root directory  
-<br>
  **Step 1 - Publish** | _dotnet publish -c Release -r linux-x64 -o ./publish ./src/RefactorThis.Api_  
  **Step 2 - Compose** | _docker-compose up_  
  **Step 3 - Browse** | (api) http://localhost:5000/swagger, (logs) http://localhost:5001  
