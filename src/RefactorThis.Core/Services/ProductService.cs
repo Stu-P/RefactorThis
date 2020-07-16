@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using RefactorThis.Core.Exceptions;
 using RefactorThis.Core.Interfaces;
@@ -16,12 +17,14 @@ namespace RefactorThis.Core.Services
         private readonly IProductRepository _productRepo;
         private readonly IKeyGenerator _keyGenerator;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
         private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IProductRepository productRepo, IKeyGenerator keyGenerator, IMapper mapper, ILogger<ProductService> logger)
+        public ProductService(IProductRepository productRepo, IKeyGenerator keyGenerator, IMemoryCache cache, IMapper mapper, ILogger<ProductService> logger)
         {
             _productRepo = productRepo ?? throw new ArgumentNullException(nameof(productRepo));
             _keyGenerator = keyGenerator ?? throw new ArgumentNullException(nameof(keyGenerator));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -108,8 +111,16 @@ namespace RefactorThis.Core.Services
         private async Task<Product> GetProductIfExists(Guid productId, bool includeOptions = false)
         {
             var timer = Stopwatch.StartNew();
-            Product product = await _productRepo.GetProductById(productId, includeOptions) ??
-                throw new EntityNotFoundException($"No product found with id {productId}");
+
+            // Product product = null;
+
+            //var exists = _cache.TryGetValue(productId, out product);
+            var product = await _cache.GetOrCreateAsync<Product>(productId, entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(5);
+                return _productRepo.GetProductById(productId, includeOptions);
+            });
+
 
             _logger.LogInformation("Product {id} found after {responseTime} ms", productId, timer.ElapsedMilliseconds);
             return product;

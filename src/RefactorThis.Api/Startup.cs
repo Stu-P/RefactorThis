@@ -29,6 +29,8 @@ namespace RefactorThis
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "RefactorThis Api", Version = "v1" }));
             services.AddSwaggerGenNewtonsoftSupport();
 
+            services.AddMemoryCache();
+
             services
                 .AddHealthChecks()
                 .AddSqlServer(Configuration.GetConnectionString("Products"));
