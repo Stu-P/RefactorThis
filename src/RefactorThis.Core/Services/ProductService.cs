@@ -26,10 +26,10 @@ namespace RefactorThis.Core.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<IEnumerable<Product>> GetProducts(string nameFilter = null)
+        public async Task<IEnumerable<Product>> GetProducts(ISpecification<Product> spec)
         {
             var timer = Stopwatch.StartNew();
-            var allMatchingProducts = await _productRepo.GetProducts(nameFilter);
+            var allMatchingProducts = await _productRepo.GetProducts(spec);
             _logger.LogInformation("GetProducts returned {count} products after {responseTime} ms", allMatchingProducts.Count(), timer.ElapsedMilliseconds);
             return allMatchingProducts ?? new List<Product>(); ;
         }

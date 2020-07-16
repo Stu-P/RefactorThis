@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using RefactorThis.Api.Models;
 using RefactorThis.Core.Interfaces;
 using RefactorThis.Core.Models;
+using RefactorThis.Core.Models.Specs;
 
 namespace RefactorThis.Controllers
 {
@@ -14,18 +15,24 @@ namespace RefactorThis.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly ISpecificationFactory<Product> _specFactory;
         private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(IProductService productService, ILogger<ProductsController> logger)
+        public ProductsController(IProductService productService, ISpecificationFactory<Product> specFactory, ILogger<ProductsController> logger)
         {
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _specFactory = specFactory ?? throw new ArgumentNullException(nameof(specFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(GetAllResponse<Product>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllProducts(string name = null) =>
-             Ok(new GetAllResponse<Product>(await _productService.GetProducts(name)));
+        public async Task<IActionResult> GetAllProducts([FromQuery] SearchCritera searchQuery)
+        {
+            return Ok(new GetAllResponse<Product>(
+                await _productService.GetProducts(_specFactory.Create(searchQuery)))
+                );
+        }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]

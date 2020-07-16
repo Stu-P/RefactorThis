@@ -56,7 +56,7 @@ namespace RefactorThis.UnitTests
             // Assert
             result.Id.IsSameOrEqualTo(testGuid);
             fixture.MockRepository.Verify(x => x.UpdateProduct(It.Is<Product>(p =>
-                 p.IsSameOrEqualTo(theory.Subsequent))), Times.Once());
+                 p.IsSameOrEqualTo(theory.Subsequent))), Times.Once(), $"scenario {description}");
         }
 
         [Fact]

@@ -7,7 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RefactorThis.Api.Filters;
+using RefactorThis.Core.Factories;
 using RefactorThis.Core.Interfaces;
+using RefactorThis.Core.Models;
 using RefactorThis.Core.Services;
 using RefactorThis.Data.Contexts;
 using RefactorThis.Data.Repositories;
@@ -50,6 +52,7 @@ namespace RefactorThis.Api.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services) =>
              services
                 .AddScoped<IProductService, ProductService>()
+                .AddScoped<ISpecificationFactory<Product>, SpecificationFactory>()
                 .AddScoped<IKeyGenerator, KeyGenerator>()
                 .AddAutoMapper(typeof(Startup), typeof(Core.Mappers.ProductRequestMapping));
     }

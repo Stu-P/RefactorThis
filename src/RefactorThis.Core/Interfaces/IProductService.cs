@@ -7,7 +7,7 @@ namespace RefactorThis.Core.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<Product>> GetProducts(string nameFilter = null);
+        Task<IEnumerable<Product>> GetProducts(ISpecification<Product> spec);
 
         Task<Product> GetProduct(Guid productId);
 
