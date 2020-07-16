@@ -21,6 +21,8 @@ namespace RefactorThis.Data.Repositories
         public async Task<IEnumerable<Product>> GetProducts(ISpecification<Product> spec) =>
             await _productDb.Products
                             .Where(spec.Criteria)
+                            //  .Where(p => true && p.Name.Contains("S"))
+
                             .ToListAsync();
 
         public async Task<Product> GetProductById(Guid productId, bool includeOptions = false) =>

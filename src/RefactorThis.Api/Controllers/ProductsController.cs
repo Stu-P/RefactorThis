@@ -27,7 +27,7 @@ namespace RefactorThis.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(GetAllResponse<Product>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllProducts([FromQuery] SearchCritera searchQuery)
+        public async Task<IActionResult> GetAllProducts([FromQuery] SearchCritera searchQuery, [FromQuery] PageDetails pageDetails)
         {
             return Ok(new GetAllResponse<Product>(
                 await _productService.GetProducts(_specFactory.Create(searchQuery)))

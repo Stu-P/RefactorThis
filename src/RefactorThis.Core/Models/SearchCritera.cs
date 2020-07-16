@@ -3,6 +3,7 @@
     public class SearchCritera
     {
         public string Name { get; set; }
-        public decimal MinPrice { get; set; }
+        public decimal? MinPrice { get; set; }
+
     }
 }

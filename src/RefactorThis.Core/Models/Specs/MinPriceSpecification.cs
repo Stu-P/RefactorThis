@@ -12,6 +12,6 @@ namespace RefactorThis.Core.Models.Specs
             _minPrice = minPrice;
         }
 
-        public Expression<Func<Product, bool>> Criteria => p => p.Price >= _minPrice;
+        public Expression<Func<Product, bool>> Criteria => p => p.Price > _minPrice;
     }
 }

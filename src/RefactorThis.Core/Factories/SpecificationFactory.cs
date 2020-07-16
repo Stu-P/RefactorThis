@@ -13,12 +13,18 @@ namespace RefactorThis.Core.Factories
 
         public ISpecification<Product> Create(SearchCritera searchCritera)
         {
+            ISpecification<Product> spec = new NoFilterSpecification();
+
             if (!string.IsNullOrWhiteSpace(searchCritera.Name))
             {
-                return new ProductNameSpecification(searchCritera.Name);
+                spec = new AndSpecification(spec, new ProductNameSpecification(searchCritera.Name));
+            }
+            if (searchCritera.MinPrice.HasValue)
+            {
+                spec = new AndSpecification(spec, new MinPriceSpecification(searchCritera.MinPrice.Value));
             }
 
-            return new NoFilterSpecification();
+            return spec;
 
         }
     }
