@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Polly;
+using Polly.Extensions.Http;
 using RefactorThis.Api.Extensions;
 using RefactorThis.Api.Helpers;
 using RefactorThis.Api.Middlewares;
+using RefactorThis.Core.Clients;
 using Serilog;
 
 namespace RefactorThis
@@ -28,6 +32,14 @@ namespace RefactorThis
             services.AddRepository(Configuration, HostingEnv);
             services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "RefactorThis Api", Version = "v1" }));
             services.AddSwaggerGenNewtonsoftSupport();
+
+            var retryPolicy = HttpPolicyExtensions.HandleTransientHttpError().RetryAsync(3);
+
+            services.AddHttpClient<IMiscApiClient, MiscClient>(options =>
+            {
+                var settings = Configuration.GetSection("MiscApiSettings").Get<HttpClientSettings>();
+                options.BaseAddress = new Uri(settings.BaseUri);
+            }).AddPolicyHandler(retryPolicy);
 
             services
                 .AddHealthChecks()
