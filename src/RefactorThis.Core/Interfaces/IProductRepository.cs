@@ -7,7 +7,7 @@ namespace RefactorThis.Core.Interfaces
 {
     public interface IProductRepository
     {
-        Task<IEnumerable<Product>> GetProducts(string nameFilter = null);
+        Task<IEnumerable<Product>> GetProducts(PagingRequest pagingRequest, string nameFilter = null);
 
         Task<Product> GetProductById(Guid productId, bool includeOptions = false);
 

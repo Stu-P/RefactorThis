@@ -24,8 +24,8 @@ namespace RefactorThis.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(GetAllResponse<Product>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllProducts(string name = null) =>
-             Ok(new GetAllResponse<Product>(await _productService.GetProducts(name)));
+        public async Task<IActionResult> GetAllProducts([FromQuery] PagingRequest pagingRequest, string name = null) =>
+             Ok(new GetAllResponse<Product>(await _productService.GetProducts(pagingRequest, name)));
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]

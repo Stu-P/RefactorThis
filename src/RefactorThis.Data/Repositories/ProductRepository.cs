@@ -18,11 +18,13 @@ namespace RefactorThis.Data.Repositories
             _productDb = productDb ?? throw new ArgumentNullException(nameof(productDb));
         }
 
-        public async Task<IEnumerable<Product>> GetProducts(string nameFilter = null) =>
+        public async Task<IEnumerable<Product>> GetProducts(PagingRequest pagingRequest, string nameFilter = null) =>
             string.IsNullOrWhiteSpace(nameFilter) ?
             await _productDb.Products.ToListAsync() :
             await _productDb.Products
-                            .Where(x => x.Name.ToLower().Contains(nameFilter.ToLower()))
+                            .Where(x => x.Name.Contains(nameFilter))
+                            .Skip(pagingRequest.StartingPosition())
+                            .Take(pagingRequest.PageSize)
                             .ToListAsync();
 
         public async Task<Product> GetProductById(Guid productId, bool includeOptions = false) =>
