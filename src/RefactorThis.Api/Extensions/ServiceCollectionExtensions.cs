@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RefactorThis.Api.Filters;
+using RefactorThis.Api.Validators;
 using RefactorThis.Core.Interfaces;
+using RefactorThis.Core.Models;
 using RefactorThis.Core.Services;
 using RefactorThis.Data.Contexts;
 using RefactorThis.Data.Repositories;
@@ -25,7 +29,8 @@ namespace RefactorThis.Api.Extensions
                     opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     opts.UseMemberCasing();
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0).AddFluentValidation()
+                ;
 
             return services;
         }
@@ -51,6 +56,7 @@ namespace RefactorThis.Api.Extensions
              services
                 .AddScoped<IProductService, ProductService>()
                 .AddScoped<IKeyGenerator, KeyGenerator>()
+                .AddScoped<IValidator<CreateProductRequest>, ProductValidator>()
                 .AddAutoMapper(typeof(Startup), typeof(Core.Mappers.ProductRequestMapping));
     }
 }
